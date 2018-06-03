@@ -39,13 +39,15 @@ function up(){
   if [ "$ORG_HYPERLEDGER_FABRIC_SDKTEST_VERSION" == "1.0.0" ]; then
     docker-compose up --force-recreate ca0 ca1 peer1.org1.example.com peer1.org2.example.com ccenv
   else
-    docker-compose up --force-recreate
+#    docker-compose up --force-recreate
+    docker-compose -f docker-compose.yaml -f docker-compose-couch.yaml up -d 2>&1
 fi
 
 }
 
 function down(){
   docker-compose down;
+  docker-compose -f docker-compose.yaml -f docker-compose-couch.yaml down --volumes
 }
 
 function stop (){

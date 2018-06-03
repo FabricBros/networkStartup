@@ -108,5 +108,5 @@ services:
       container_name: configtxlator
 ##################################################################
 ##################################################################
-  ccenv:
-    image: hyperledger/fabric-ccenv${IMAGE_TAG_FABRIC}
+#  ccenv:
+#    image: hyperledger/fabric-ccenv${IMAGE_TAG_FABRIC}
