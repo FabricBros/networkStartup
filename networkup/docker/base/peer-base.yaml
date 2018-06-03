@@ -7,7 +7,8 @@ services:
       # the following setting starts chaincode containers on the same
       # bridge network as the peers
       # https://docs.docker.com/compose/networking/
-      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=sdkintegration_default
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabricbros
+#      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=sdkintegration_fabricbros
       #- CORE_LOGGING_LEVEL=ERROR
       - CORE_LOGGING_LEVEL=DEBUG
       - CORE_PEER_ENDORSER_ENABLED=true
