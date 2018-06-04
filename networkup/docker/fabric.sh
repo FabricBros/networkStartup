@@ -6,6 +6,9 @@
 #
 # simple batch script making it easier to cleanup and start a relatively fresh fabric env.
 
+current_dir=$(pwd)
+#echo $current_dir/test
+
 if [ ! -e "docker-compose.yaml" ];then
   echo "docker-compose.yaml not found."
   exit 8
@@ -59,10 +62,19 @@ function start (){
 }
 
 #todo
-#function createChannel(){
-#}
-##function joinChannel(){}
-##function installCC(){}
+function createChannel(){
+    CORE_PEER_LOCALMSPID=Org1MSP CORE_PEER_MSPCONFIGPATH=$current_dir/crypto/v1.1/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/ peer channel create -o 127.0.0.1:7050 -c foo -f $current_dir/crypto/v1.1/foo.tx
+}
+
+
+function joinChannel(){
+    CORE_PEER_LOCALMSPID=Org1MSP CORE_PEER_MSPCONFIGPATH=$current_dir/crypto/v1.1/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/ peer channel join -b foo.block
+#    CORE_PEER_LOCALMSPID=Org2MSP CORE_PEER_MSPCONFIGPATH=$current_dir/crypto/v1.1/crypto-config/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/ peer channel join -b foo.block
+
+}
+##function installCC(){
+# check that env FABRICBROS_CC_PATH is set
+# }
 ##function instantiateCC(){}
 
 
@@ -85,6 +97,12 @@ do
         clean)
             clean
             ;;
+        createChannel)
+            createChannel
+            ;;
+        joinChannel)
+            joinChannel
+            ;;
         restart)
             down
             clean
@@ -92,7 +110,7 @@ do
             ;;
 
         *)
-            echo $"Usage: $0 {up|down|start|stop|clean|restart}"
+            echo $"Usage: $0 {up|down|start|stop|clean|restart|createChannel|joinChannel}"
             exit 1
 
 esac
