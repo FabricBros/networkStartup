@@ -58,6 +58,13 @@ function start (){
   docker-compose start;
 }
 
+#todo
+#function createChannel(){
+#}
+##function joinChannel(){}
+##function installCC(){}
+##function instantiateCC(){}
+
 
 for opt in "$@"
 do
