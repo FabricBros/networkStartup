@@ -1,6 +1,7 @@
 #Quick Start:
 
-./fabric.sh up -- starts up basic network
+./fabric.sh up -- starts up basic network, on another terminal, check your network using 'docker ps -a' command
+                    
 
 ./fabric.sh createChannel -- creates channel foo using peer0.org1.example.com
 
