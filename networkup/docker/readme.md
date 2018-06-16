@@ -111,7 +111,7 @@ To turn off peer0.org1.example.com, comment out these 2 block of code
 ## Invoke
 
 ```
-$ ./fabric.sh invoke ccname2 v1  '{"Args":["initMarble","marble1","red","username","100"]}'
+$ ./fabric.sh invoke mycc4 v1  '{"Args":["initMarble","marble1","red","100","username"]}'
 
 Init cc with args: {"Args":["initMarble","marble2","red","username","100"]}
 2018-06-16 14:51:40.684 UTC [chaincodeCmd] InitCmdFactory -> INFO 001 Get chain(foo) orderer endpoint: orderer.example.com:7050
