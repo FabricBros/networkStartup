@@ -1,29 +1,36 @@
-#Quick Start:
+# Quick Start:
 Chaincode development should take place in your GOPATH
 
 Setup ENV
 
+
 vim ~/.bash_profile and export MHC_FABRIC_CCROOT=$GOPATH/src/\<path into your cc files>
 
+
 Don't forget to source .bash_profile
-###Setting MHC_FABRIC_CCROOT is required for script ./fabric.sh up to work
+### Setting MHC_FABRIC_CCROOT is required for script ./fabric.sh up to work
 
     ./fabric.sh up -- starts up basic network, on another terminal, check your network using 'docker ps -a' command
 
 `Note, when fabric.sh up, channel foo gets created and peer joins the channel`
 
+
     ./fabric.sh down -- take network down
 
-###To run chaincode in devmode
-    ./fabric.sh startCC arg1 arg2
+
+### To run chaincode in devmode
+
+```
+./fabric.sh startCC arg1 arg2
     
     arg1 = CC_NAME
     
     arg2 = CC_VER
+```
 
 arguments are optional
 
-###To Install and instantiate chaincode:
+### To Install and instantiate chaincode:
 
 (after ./fabric.sh up)
 
