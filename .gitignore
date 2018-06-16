@@ -2,6 +2,8 @@
 /build/
 !gradle/wrapper/gradle-wrapper.jar
 
+network/docker/*.block
+
 ### STS ###
 .apt_generated
 .classpath
