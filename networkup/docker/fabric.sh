@@ -155,7 +155,7 @@ function startCC(){
 
 
     echo "Using CC_NAME=${CC_NAME} and CC_VER=${CC_VER}"
-    cd ${MHC_FABRIC_CCROOT} && go clean && go build -o ccgo && CORE_CHAINCODE_LOGLEVEL=debug CORE_PEER_ADDRESS=192.168.1.228:7052 CORE_CHAINCODE_ID_NAME=${CC_NAME}:${CC_VER} ./ccgo
+    cd ${MHC_FABRIC_CCROOT} && go clean && go build -o ccgo && CORE_CHAINCODE_LOGLEVEL=debug CORE_PEER_ADDRESS=127.0.0.1:7052 CORE_CHAINCODE_ID_NAME=${CC_NAME}:${CC_VER} ./ccgo
     exit 0
 }
 
