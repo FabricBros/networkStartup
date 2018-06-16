@@ -2,9 +2,10 @@
 Chaincode development should take place in your GOPATH
 
 Setup ENV
-```
+
+
 vim ~/.bash_profile and export MHC_FABRIC_CCROOT=$GOPATH/src/\<path into your cc files>
-```
+
 
 Don't forget to source .bash_profile
 ### Setting MHC_FABRIC_CCROOT is required for script ./fabric.sh up to work
@@ -13,11 +14,12 @@ Don't forget to source .bash_profile
 
 `Note, when fabric.sh up, channel foo gets created and peer joins the channel`
 
-```
+
     ./fabric.sh down -- take network down
-```
+
 
 ### To run chaincode in devmode
+
 ```
 ./fabric.sh startCC arg1 arg2
     
