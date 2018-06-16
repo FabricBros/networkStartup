@@ -109,6 +109,32 @@ function instantiateCC(){
     docker exec cli peer chaincode instantiate -n ${CC_NAME} -v ${CC_VER} -c '{"Args":["init","a","100","b","200"]}' -C foo
 }
 
+
+function invoke(){
+    CC_NAME=$1
+    CC_VER=$2
+    CC_ARGS=$3
+
+    if [[ -z "${CC_NAME}" ]] ; then
+        echo "Missing argument for CC_NAME setting default to 'defaultcc'"
+        CC_NAME=defaultcc
+    fi
+
+    if [[ -z "${CC_VER}" ]] ; then
+        echo "Missing argument for CC_VER setting default to v1"
+        CC_VER=v1
+    fi
+    if [[ -z "${CC_ARGS}" ]] ; then
+        echo "Missing argument for CC_ARGS setting default to" '{"Args":["no","need","for","init"]}'
+        CC_ARGS='{"Args":["no","need","for","init"]}'
+    fi
+
+    echo "Init cc with args: ${CC_ARGS}"
+
+    docker exec cli peer chaincode invoke -n ${CC_NAME} -v ${CC_VER} -c ${CC_ARGS} -C foo
+    # peer chaincode invoke -n mycc -c '{"Args":["invoke","a","b","10"]}' -o 127.0.0.1:7050 -C ch1
+}
+
 function startCC(){
 
     CC_NAME=$1
@@ -129,7 +155,7 @@ function startCC(){
 
 
     echo "Using CC_NAME=${CC_NAME} and CC_VER=${CC_VER}"
-    cd ${MHC_FABRIC_CCROOT} && go clean && go build -o ccgo && CORE_CHAINCODE_LOGLEVEL=debug CORE_PEER_ADDRESS=127.0.0.1:7052 CORE_CHAINCODE_ID_NAME=${CC_NAME}:${CC_VER} ./ccgo
+    cd ${MHC_FABRIC_CCROOT} && go clean && go build -o ccgo && CORE_CHAINCODE_LOGLEVEL=debug CORE_PEER_ADDRESS=192.168.1.228:7052 CORE_CHAINCODE_ID_NAME=${CC_NAME}:${CC_VER} ./ccgo
     exit 0
 }
 
@@ -149,7 +175,6 @@ function installAndInstantiate(){
 function testThis(){
     docker exec -it cli bash
 }
-
 
 
 for opt in "$@"
@@ -191,9 +216,12 @@ do
             clean
             up
             ;;
+        invoke)
+            invoke $2 $3 $4
+            ;;
 
         *)
-            echo $"Usage: $0 {up | down | start | stop | clean | restart | createChannel | joinChannel | startCC CC_NAME CC_VER (arg1 and arg2 optional) | installCC CC_NAME CC_VER (arg1 and arg2 optional)}"
+            echo $"Usage: $0 {up | down | start | stop | clean | restart | createChannel | joinChannel | startCC CC_NAME CC_VER (arg1 and arg2 optional) | installCC CC_NAME CC_VER (arg1 and arg2 optional) | invoke CC_NAME CC_VER CC_ARGS}"
             exit 1
 
 esac
