@@ -17,7 +17,7 @@ peer channel create -c foo -f ./crypto/v1.1/foo.tx -o orderer.example.com:7050
 # now we will join the channel and start the chain with myc.block serving as the
 # channel's first block (i.e. the genesis block)
 echo "joining channel"
-asddsd
+
 peer channel join -b foo.block
 
 # Now the user can proceed to build and start chaincode in one terminal

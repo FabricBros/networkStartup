@@ -106,7 +106,7 @@ function instantiateCC(){
 
     echo "Instantiating cc with args: ${CC_ARGS}"
 
-    docker exec cli peer chaincode instantiate -n ${CC_NAME} -v ${CC_VER} -c '{"Args":["no","need","for","init"]}' -C foo
+    docker exec cli peer chaincode instantiate -n ${CC_NAME} -v ${CC_VER} -c '{"Args":["init","a","100","b","200"]}' -C foo
 }
 
 function startCC(){
@@ -132,6 +132,8 @@ function startCC(){
     cd ${MHC_FABRIC_CCROOT} && go clean && go build  && CORE_CHAINCODE_LOGLEVEL=debug CORE_PEER_ADDRESS=127.0.0.1:7052 CORE_CHAINCODE_ID_NAME=${CC_NAME}:${CC_VER} ./go
     exit 0
 }
+
+
 
 function installAndInstantiate(){
 
