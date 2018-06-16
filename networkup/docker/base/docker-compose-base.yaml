@@ -44,7 +44,7 @@ services:
     volumes:
       - /var/run/:/host/var/run/
       - ./../crypto/${FAB_CONFIG_GEN_VERS}/:/channel-artifacts:ro
-      - ./../crypto/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/:/etc/hyperledger/admin
+      - ./../crypto/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/:/etc/hyperledger/admin
       - ./../crypto/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/:/etc/hyperledger/msp/peer:ro
     ports:
       - 7051:7051

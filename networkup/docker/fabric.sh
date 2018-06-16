@@ -7,6 +7,7 @@
 # simple batch script making it easier to cleanup and start a relatively fresh fabric env.
 
 current_dir=$(pwd)
+
 #echo $current_dir/test
 
 if [ ! -e "docker-compose.yaml" ];then
@@ -39,12 +40,18 @@ function clean(){
 
 function up(){
 
-  if [ "$ORG_HYPERLEDGER_FABRIC_SDKTEST_VERSION" == "1.0.0" ]; then
-    docker-compose up --force-recreate ca0 ca1 peer1.org1.example.com peer1.org2.example.com ccenv
-  else
+
+    if [[ -z "${MHC_FABRIC_CCROOT}" ]] ; then
+        echo "Missing MHC_FABRIC_CCROOT ENV! Set the ENV to the chaincode files path"
+        exit 1
+    fi
+
+    if [ "$ORG_HYPERLEDGER_FABRIC_SDKTEST_VERSION" == "1.0.0" ]; then
+        docker-compose up --force-recreate ca0 ca1 peer1.org1.example.com peer1.org2.example.com ccenv
+    else
 #    docker-compose up --force-recreate
-    docker-compose -f docker-compose.yaml -f docker-compose-couch.yaml up -d 2>&1
-fi
+        docker-compose -f docker-compose.yaml -f docker-compose-couch.yaml up --force-recreate -d 2>&1
+    fi
 
 }
 
@@ -61,21 +68,86 @@ function start (){
   docker-compose start;
 }
 
-#todo
-function createChannel(){
-    CORE_PEER_LOCALMSPID=Org1MSP CORE_PEER_MSPCONFIGPATH=$current_dir/crypto/v1.1/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/ peer channel create -o 127.0.0.1:7050 -c foo -f $current_dir/crypto/v1.1/foo.tx
+
+function installCC(){
+
+    CC_NAME=$1
+    CC_VER=$2
+
+    if [[ -z "${CC_NAME}" ]] ; then
+        echo "Missing argument for CC_NAME setting default to 'defaultcc'"
+        CC_NAME=defaultcc
+    fi
+
+    if [[ -z "${CC_VER}" ]] ; then
+        echo "Missing argument for CC_VER setting default to v1"
+        CC_VER=v1
+    fi
+
+    echo "Install cc using ${CC_NAME}:${CC_VER}"
+
+    docker exec cli peer chaincode install -p chaincode -n ${CC_NAME} -v ${CC_VER}
+
+}
+
+function instantiateCC(){
+    CC_NAME=$1
+    CC_VER=$2
+
+    if [[ -z "${CC_NAME}" ]] ; then
+        echo "Missing argument for CC_NAME setting default to 'defaultcc'"
+        CC_NAME=defaultcc
+    fi
+
+    if [[ -z "${CC_VER}" ]] ; then
+        echo "Missing argument for CC_VER setting default to v1"
+        CC_VER=v1
+    fi
+
+    echo "Instantiating cc with args: ${CC_ARGS}"
+
+    docker exec cli peer chaincode instantiate -n ${CC_NAME} -v ${CC_VER} -c '{"Args":["no","need","for","init"]}' -C foo
+}
+
+function startCC(){
+
+    CC_NAME=$1
+    CC_VER=$2
+    if [[ -z "${MHC_FABRIC_CCROOT}" ]] ; then
+        echo "Missing MHC_FABRIC_CCROOT ENV! Set the ENV to the chaincode files path"
+    fi
+
+    if [[ -z "${CC_NAME}" ]] ; then
+        echo "Missing argument for CC_NAME setting default to 'defaultcc'"
+        CC_NAME=defaultcc
+    fi
+
+    if [[ -z "${CC_VER}" ]] ; then
+        echo "Missing argument for CC_VER setting default to v1"
+        CC_VER=v1
+    fi
+
+
+    echo "Using CC_NAME=${CC_NAME} and CC_VER=${CC_VER}"
+    cd ${MHC_FABRIC_CCROOT} && go clean && go build  && CORE_CHAINCODE_LOGLEVEL=debug CORE_PEER_ADDRESS=127.0.0.1:7052 CORE_CHAINCODE_ID_NAME=${CC_NAME}:${CC_VER} ./go
+    exit 0
+}
+
+function installAndInstantiate(){
+
+
+    installCC $1 $2
+
+    instantiateCC $1 $2
+
+    exit 0
 }
 
 
-function joinChannel(){
-    CORE_PEER_LOCALMSPID=Org1MSP CORE_PEER_MSPCONFIGPATH=$current_dir/crypto/v1.1/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/ peer channel join -b foo.block
-#    CORE_PEER_LOCALMSPID=Org2MSP CORE_PEER_MSPCONFIGPATH=$current_dir/crypto/v1.1/crypto-config/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/ peer channel join -b foo.block
-
+function testThis(){
+    docker exec -it cli bash
 }
-##function installCC(){
-# check that env FABRICBROS_CC_PATH is set
-# }
-##function instantiateCC(){}
+
 
 
 for opt in "$@"
@@ -97,11 +169,20 @@ do
         clean)
             clean
             ;;
-        createChannel)
-            createChannel
+        runCC)
+            installAndInstantiate $2 $3
             ;;
-        joinChannel)
-            joinChannel
+        instantiateCC)
+            instantiateCC $2 $3
+            ;;
+        startCC)
+            startCC $2 $3
+            ;;
+        installCC)
+            installCC $2 $3
+            ;;
+        test)
+            testThis $2
             ;;
         restart)
             down
@@ -110,7 +191,7 @@ do
             ;;
 
         *)
-            echo $"Usage: $0 {up|down|start|stop|clean|restart|createChannel|joinChannel}"
+            echo $"Usage: $0 {up | down | start | stop | clean | restart | createChannel | joinChannel | startCC CC_NAME CC_VER (arg1 and arg2 optional) | installCC CC_NAME CC_VER (arg1 and arg2 optional)}"
             exit 1
 
 esac
