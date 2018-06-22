@@ -49,7 +49,7 @@ arguments are optional
 
 `Terminal 1`
 
-    ./fabric runCC ccname v1
+    ./fabric.sh runCC ccname v1
 
 #To Modify and add peers and orgs to network:
 Currently, tha yaml is setup for 2 orgs (Org1MSP and Org2MSP), and 2 peers and a fabric-ca each with 1 solo orderer.
@@ -105,3 +105,27 @@ and inside docker-compose-couch.yaml
           - couchdb0
           
 To turn off peer0.org1.example.com, comment out these 2 block of code
+
+
+
+## Invoke
+
+```
+$ ./fabric.sh invoke mycc4 v1  '{"Args":["initMarble","marble1","red","100","username"]}'
+
+Init cc with args: {"Args":["initMarble","marble2","red","username","100"]}
+2018-06-16 14:51:40.684 UTC [chaincodeCmd] InitCmdFactory -> INFO 001 Get chain(foo) orderer endpoint: orderer.example.com:7050
+2018-06-16 14:51:40.686 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 002 Using default escc
+2018-06-16 14:51:40.686 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 003 Using default vscc
+2018-06-16 14:51:40.710 UTC [chaincodeCmd] chaincodeInvokeOrQuery -> INFO 004 Chaincode invoke successful. result: status:200
+2018-06-16 14:51:40.710 UTC [main] main -> INFO 005 Exiting.....
+
+$ ./fabric.sh invoke ccname2 v1  '{"Args":["queryMarblesByOwner","username"]}'
+Init cc with args: {"Args":["queryMarblesByOwner","username"]}
+2018-06-16 14:53:35.052 UTC [chaincodeCmd] InitCmdFactory -> INFO 001 Get chain(foo) orderer endpoint: orderer.example.com:7050
+2018-06-16 14:53:35.054 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 002 Using default escc
+2018-06-16 14:53:35.054 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 003 Using default vscc
+2018-06-16 14:53:35.203 UTC [chaincodeCmd] chaincodeInvokeOrQuery -> INFO 004 Chaincode invoke successful. result: status:200 payload:"[{\"Key\":\"marble3\", \"Record\":{\"color\":\"red\",\"docType\":\"marble\",\"name\":\"marble3\",\"owner\":\"username\",\"size\":100}}]"
+2018-06-16 14:53:35.204 UTC [main] main -> INFO 005 Exiting.....
+
+```
