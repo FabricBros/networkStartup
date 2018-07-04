@@ -210,7 +210,7 @@ function query(){
         CC_ARGS='{"Args":["no","need","for","init"]}'
     fi
 
-    echo "Init cc with args: ${CC_ARGS}"
+    echo "Query cc with args: ${CC_ARGS}"
 
     docker exec cli peer chaincode query -n ${CC_NAME} -c ${CC_ARGS} -C ${CHANNEL}
 }
@@ -266,7 +266,7 @@ function e2e(){
     sleep 20 ## Wait for chaincode to build and run
     installAndInstantiate
     sleep 20
-    invoke  '{"Args":["set","key","value"]}'
+    invoke  '{"Args":["set","key","updated value"]}'
     query  '{"Args":["get","key"]}'
 }
 
