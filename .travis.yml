@@ -1,12 +1,16 @@
 sudo: required
 
-language: generic
+language: go
+
+go:
+  - "1.10"
 
 notifications:
   email: false
 
 env:
   - DOCKER_COMPOSE_VERSION=1.14.0
+  - CHANNEL=mychannel
 
 services:
   - docker
@@ -17,10 +21,11 @@ install:
   - curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
+  - go get github.com/hyperledger/fabric/core/chaincode/shim
 
   # Get appropriate binaries...
-  - curl -sSL https://goo.gl/6wtTN5 | bash -s 1.1.0
-  - export PATH=`pwd`/fabric-samples/bin:$PATH
+  #  - curl -sSL https://goo.gl/6wtTN5 | bash -s 1.1.0
+  #  - export PATH=`pwd`/fabric-samples/bin:$PATH
 
 before_script:
   # Check docker & docker-compose versions
