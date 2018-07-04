@@ -17,6 +17,16 @@ networks:
 
 services:
 # usage docker exec -it cli bash
+#  generator:
+#      image: hyperledger/fabric-tools${IMAGE_TAG_FABRIC}
+#      environment:
+#        - CHANNEL=mychannel
+#        - FAB_CONFIG_GEN_VERS=${FAB_CONFIG_GEN_VERS}
+#      command: /bin/bash -c './scripts/generateArtifacts.sh'
+#      container_name: generator
+#      working_dir:  /opt/gopath/src/chaincodedev
+#      volumes:
+#        - ./:/opt/gopath/src/chaincodedev/
   cli:
     container_name: cli
     image: hyperledger/fabric-tools:latest
