@@ -15,7 +15,9 @@ if [ ! -e "docker-compose.yaml" ];then
   exit 8
 fi
 
+source .env
 ORG_HYPERLEDGER_FABRIC_SDKTEST_VERSION=${ORG_HYPERLEDGER_FABRIC_SDKTEST_VERSION:-}
+CHANNEL=${CHANNEL}
 
 function clean(){
 
@@ -40,7 +42,6 @@ function clean(){
 
 function up(){
 
-
     if [[ -z "${MHC_FABRIC_CCROOT}" ]] ; then
         echo "Missing MHC_FABRIC_CCROOT ENV! Set the ENV to the chaincode files path"
         exit 1
@@ -51,6 +52,22 @@ function up(){
     else
 #    docker-compose up --force-recreate
         docker-compose -f docker-compose.yaml -f docker-compose-couch.yaml up --force-recreate -d 2>&1
+    fi
+
+}
+
+function up1(){
+
+    if [[ -z "${MHC_FABRIC_CCROOT}" ]] ; then
+        echo "Missing MHC_FABRIC_CCROOT ENV! Set the ENV to the chaincode files path"
+        exit 1
+    fi
+
+    if [ "$ORG_HYPERLEDGER_FABRIC_SDKTEST_VERSION" == "1.0.0" ]; then
+        docker-compose up --force-recreate ca0 ca1 peer1.org1.example.com peer1.org2.example.com ccenv
+    else
+#    docker-compose up --force-recreate
+        docker-compose -f docker-compose-single.yaml -f docker-compose-single-couch.yaml up --force-recreate -d 2>&1
     fi
 
 }
@@ -106,14 +123,18 @@ function instantiateCC(){
 
     echo "Instantiating cc with args: ${CC_ARGS}"
 
-    docker exec cli peer chaincode instantiate -n ${CC_NAME} -v ${CC_VER} -c '{"Args":["init","a","100","b","200"]}' -C foo
+    docker exec cli peer chaincode instantiate -n ${CC_NAME} -v ${CC_VER} -c '{"Args":["init","a","100","b","200"]}' -C ${CHANNEL}
 }
 
-
 function invoke(){
-    CC_NAME=$1
-    CC_VER=$2
-    CC_ARGS=$3
+    CC_ARGS=$1
+    CC_NAME=$2
+    CC_VER=$3
+
+    if [[ -z "${CC_ARGS}" ]] ; then
+        echo "Missing argument for CC_ARGS setting default to" '{"Args":["no","need","for","init"]}'
+        CC_ARGS='{"Args":["no","need","for","init"]}'
+    fi
 
     if [[ -z "${CC_NAME}" ]] ; then
         echo "Missing argument for CC_NAME setting default to 'defaultcc'"
@@ -124,15 +145,48 @@ function invoke(){
         echo "Missing argument for CC_VER setting default to v1"
         CC_VER=v1
     fi
-    if [[ -z "${CC_ARGS}" ]] ; then
-        echo "Missing argument for CC_ARGS setting default to" '{"Args":["no","need","for","init"]}'
-        CC_ARGS='{"Args":["no","need","for","init"]}'
-    fi
 
-    echo "Init cc with args: ${CC_ARGS}"
 
-    docker exec cli peer chaincode invoke -n ${CC_NAME} -v ${CC_VER} -c ${CC_ARGS} -C foo
+    echo "Invoke cc with args: ${CC_ARGS}"
+
+    docker exec cli peer chaincode invoke -n ${CC_NAME} -v ${CC_VER} -c ${CC_ARGS} -C ${CHANNEL}
     # peer chaincode invoke -n mycc -c '{"Args":["invoke","a","b","10"]}' -o 127.0.0.1:7050 -C ch1
+}
+
+
+function generate(){
+
+cd crypto/v1.1/
+#https://github.com/jcs47/hyperledger-bftsmart/issues/8
+#Wait a second, are you using the same channel ID to create both the
+# genesisblock and also the channel creation ID? You can't do that.
+# When creating the genesis block, you supply the ID for the system
+# channel, while when creating the channel transaction, you are
+# creating a new channel for a another network.
+
+configtxgen -profile TwoOrgsOrdererGenesis -outputBlock ./orderer.block -channelID mysyschannel
+configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel.tx -channelID foo
+configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./Org1MSPanchors.tx -channelID foo -asOrg Org1MSP
+configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./Org2MSPanchors.tx -channelID foo -asOrg Org2MSP
+
+}
+
+function generate1(){
+
+cd crypto/${FAB_CONFIG_GEN_VERS}/
+rm -r ./crypto-config channel.tx orderer.block Org1MSPanchors.tx
+
+#https://github.com/jcs47/hyperledger-bftsmart/issues/8
+#Wait a second, are you using the same channel ID to create both the
+# genesisblock and also the channel creation ID? You can't do that.
+# When creating the genesis block, you supply the ID for the system
+# channel, while when creating the channel transaction, you are
+# creating a new channel for a another network.
+cryptogen generate --config=./crypto-config.yaml
+configtxgen -profile OrgOrdererGenesis -outputBlock ./orderer.block -channelID mysyschannel
+configtxgen -profile OrgChannel -outputCreateChannelTx ./channel.tx -channelID ${CHANNEL}
+configtxgen -profile OrgChannel -outputAnchorPeersUpdate ./Org1MSPanchors.tx -channelID ${CHANNEL} -asOrg Org1MSP
+cd ../../
 }
 
 
@@ -157,7 +211,7 @@ function query(){
 
     echo "Init cc with args: ${CC_ARGS}"
 
-    docker exec cli peer chaincode query -n ${CC_NAME} -v ${CC_VER} -c ${CC_ARGS} -C foo
+    docker exec cli peer chaincode query -n ${CC_NAME} -v ${CC_VER} -c ${CC_ARGS} -C ${CHANNEL}
 }
 
 function startCC(){
@@ -181,7 +235,7 @@ function startCC(){
 
     echo "Using CC_NAME=${CC_NAME} and CC_VER=${CC_VER}"
     cd ${MHC_FABRIC_CCROOT} && go clean && go build -o ccgo && CORE_CHAINCODE_LOGGING_SHIM=debug CORE_PEER_ADDRESS=127.0.0.1:7052 CORE_CHAINCODE_ID_NAME=${CC_NAME}:${CC_VER} ./ccgo
-    exit 0
+#    exit 0
 }
 
 
@@ -193,7 +247,7 @@ function installAndInstantiate(){
 
     instantiateCC $1 $2
 
-    exit 0
+#    exit 0
 }
 
 
@@ -202,10 +256,21 @@ function testThis(){
 }
 
 
-for opt in "$@"
-do
+function e2e(){
+    generate1
+    up1
+    sleep 60 ## Wait for fabric network to startup
+    startCC &
+    sleep 20 ## Wait for chaincode to build and run
+    installAndInstantiate
+    sleep 10
+    invoke  '{"Args":["Ping"]}'
+}
 
-    case "$opt" in
+
+echo "CMD: $1"
+
+case "$1" in
         up)
             up
             ;;
@@ -244,12 +309,23 @@ do
         invoke)
             invoke $2 $3 $4
             ;;
-         query)
+        query)
             query $2 $3 $4
             ;;
+        generate)
+            generate
+            ;;
+        generate1)
+            generate1
+            ;;
+        up1)
+            up1
+            ;;
+        e2e)
+            e2e
+            ;;
         *)
-            echo $"Usage: $0 {up | down | start | stop | clean | restart | createChannel | joinChannel | startCC CC_NAME CC_VER (arg1 and arg2 optional) | installCC CC_NAME CC_VER (arg1 and arg2 optional) | invoke CC_NAME CC_VER CC_ARGS | query CC_NAME CC_VER CC_ARGS}"
+            echo $"Usage: $0 {up | down | start | stop | clean | restart | createChannel | joinChannel | startCC CC_NAME CC_VER (arg1 and arg2 optional) | installCC CC_NAME CC_VER (arg1 and arg2 optional) | invoke CC_ARGS CC_NAME CC_VER | query CC_ARGS CC_NAME CC_VER }"
             exit 1
-
+            ;;
 esac
-done
