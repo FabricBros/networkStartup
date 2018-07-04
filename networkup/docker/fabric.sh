@@ -123,7 +123,7 @@ function instantiateCC(){
 
     echo "Instantiating cc with args: ${CC_ARGS}"
 
-    docker exec cli peer chaincode instantiate -n ${CC_NAME} -v ${CC_VER} -c '{"Args":["init","a","100","b","200"]}' -C ${CHANNEL}
+    docker exec cli peer chaincode instantiate -n ${CC_NAME} -v ${CC_VER} -c '{"Args":["key","value"]}' -C ${CHANNEL}
 }
 
 function invoke(){
@@ -192,9 +192,9 @@ function generate1(){
 
 
 function query(){
-    CC_NAME=$1
-    CC_VER=$2
-    CC_ARGS=$3
+    CC_ARGS=$1
+    CC_NAME=$2
+    CC_VER=$3
 
     if [[ -z "${CC_NAME}" ]] ; then
         echo "Missing argument for CC_NAME setting default to 'defaultcc'"
@@ -258,14 +258,16 @@ function testThis(){
 
 
 function e2e(){
-    generate1
+    export MHC_FABRIC_CCROOT=`pwd`/chaincode/sacc
+    #generate1
     up1
     sleep 60 ## Wait for fabric network to startup
     startCC &
     sleep 20 ## Wait for chaincode to build and run
     installAndInstantiate
-    sleep 10
-    invoke  '{"Args":["Ping"]}'
+    sleep 20
+    invoke  '{"Args":["set","key","value"]}'
+    query  '{"Args":["get","key"]}'
 }
 
 
