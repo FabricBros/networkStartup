@@ -260,14 +260,14 @@ function testThis(){
 function e2e(){
     export MHC_FABRIC_CCROOT=`pwd`/chaincode/sacc
     #generate1
-    startCC
-#    up1
-#    sleep 60 ## Wait for fabric network to startup
-#    sleep 20 ## Wait for chaincode to build and run
-#    installAndInstantiate
-#    sleep 20
-#    invoke  '{"Args":["set","key","value"]}'
-#    query  '{"Args":["get","key"]}'
+    up1
+    sleep 60 ## Wait for fabric network to startup
+    startCC &
+    sleep 20 ## Wait for chaincode to build and run
+    installAndInstantiate
+    sleep 20
+    invoke  '{"Args":["set","key","value"]}'
+    query  '{"Args":["get","key"]}'
 }
 
 
