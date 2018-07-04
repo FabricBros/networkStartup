@@ -9,8 +9,9 @@ notifications:
   email: false
 
 env:
-  - DOCKER_COMPOSE_VERSION=1.14.0
-  - CHANNEL=mychannel
+  global:
+    - DOCKER_COMPOSE_VERSION=1.14.0
+    - CHANNEL=mychannel
 
 services:
   - docker
