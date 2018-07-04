@@ -103,7 +103,7 @@ function installCC(){
 
     echo "Install cc using ${CC_NAME}:${CC_VER}"
 
-    docker exec cli peer chaincode install -p chaincode -n ${CC_NAME} -v ${CC_VER}
+    docker exec cli peer chaincode install -p chaincode -n ${CC_NAME}
 
 }
 
