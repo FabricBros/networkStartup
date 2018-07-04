@@ -25,5 +25,5 @@ before_script:
   - docker-compose --version
 
 script:
-  - cd network/docker
+  - cd networkup/docker
   - ./fabric.sh e2e
