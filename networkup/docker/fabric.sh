@@ -123,7 +123,7 @@ function instantiateCC(){
 
     echo "Instantiating cc with args: ${CC_ARGS}"
 
-    docker exec cli peer chaincode instantiate -n ${CC_NAME} -c '{"Args":["key","value"]}' -C ${CHANNEL}
+    docker exec cli peer chaincode instantiate -n ${CC_NAME} -v ${CC_VER} -c '{"Args":["key","value"]}' -C ${CHANNEL}
 }
 
 function invoke(){
