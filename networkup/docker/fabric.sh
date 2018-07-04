@@ -123,7 +123,7 @@ function instantiateCC(){
 
     echo "Instantiating cc with args: ${CC_ARGS}"
 
-    docker exec cli peer chaincode instantiate -n ${CC_NAME} -v ${CC_VER} -c '{"Args":["key","value"]}' -C ${CHANNEL}
+    docker exec cli peer chaincode instantiate -n ${CC_NAME} -c '{"Args":["key","value"]}' -C ${CHANNEL}
 }
 
 function invoke(){
@@ -149,7 +149,7 @@ function invoke(){
 
     echo "Invoke cc with args: ${CC_ARGS}"
 
-    docker exec cli peer chaincode invoke -n ${CC_NAME} -v ${CC_VER} -c ${CC_ARGS} -C ${CHANNEL}
+    docker exec cli peer chaincode invoke -n ${CC_NAME} -c ${CC_ARGS} -C ${CHANNEL}
     # peer chaincode invoke -n mycc -c '{"Args":["invoke","a","b","10"]}' -o 127.0.0.1:7050 -C ch1
 }
 
@@ -212,7 +212,7 @@ function query(){
 
     echo "Init cc with args: ${CC_ARGS}"
 
-    docker exec cli peer chaincode query -n ${CC_NAME} -v ${CC_VER} -c ${CC_ARGS} -C ${CHANNEL}
+    docker exec cli peer chaincode query -n ${CC_NAME} -c ${CC_ARGS} -C ${CHANNEL}
 }
 
 function startCC(){
@@ -235,7 +235,7 @@ function startCC(){
 
 
     echo "Using CC_NAME=${CC_NAME} and CC_VER=${CC_VER}"
-    cd ${MHC_FABRIC_CCROOT} && go clean && go build -o ccgo && CORE_CHAINCODE_LOGGING_SHIM=debug CORE_PEER_ADDRESS=127.0.0.1:7052 CORE_CHAINCODE_ID_NAME=${CC_NAME}:${CC_VER} ./ccgo
+    cd ${MHC_FABRIC_CCROOT} && go clean && go build -o ccgo && CORE_CHAINCODE_LOGGING_SHIM=debug CORE_PEER_ADDRESS=127.0.0.1:7052 CORE_CHAINCODE_ID_NAME=${CC_NAME} ./ccgo
 #    exit 0
 }
 
