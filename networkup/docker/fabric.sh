@@ -103,7 +103,7 @@ function installCC(){
 
     echo "Install cc using ${CC_NAME}:${CC_VER}"
 
-    docker exec cli peer chaincode install -p chaincode -n ${CC_NAME}
+    docker exec cli peer chaincode install -p chaincode -n ${CC_NAME} -v ${CC_VER}
 
 }
 
@@ -235,7 +235,7 @@ function startCC(){
 
 
     echo "Using CC_NAME=${CC_NAME} and CC_VER=${CC_VER}"
-    cd ${MHC_FABRIC_CCROOT} && go clean && go build -o ccgo && CORE_CHAINCODE_LOGGING_SHIM=debug CORE_PEER_ADDRESS=127.0.0.1:7052 CORE_CHAINCODE_ID_NAME=${CC_NAME} ./ccgo
+    cd ${MHC_FABRIC_CCROOT} && go clean && go build -o ccgo && CORE_CHAINCODE_LOGGING_SHIM=debug CORE_PEER_ADDRESS=127.0.0.1:7052 CORE_CHAINCODE_ID_NAME=${CC_NAME}:${CC_VER} ./ccgo
 #    exit 0
 }
 
