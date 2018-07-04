@@ -2,6 +2,9 @@ sudo: required
 
 language: generic
 
+notifications:
+  email: false
+
 env:
   - DOCKER_COMPOSE_VERSION=1.14.0
 
