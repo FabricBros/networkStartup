@@ -266,7 +266,7 @@ function e2e(){
     sleep 20 ## Wait for chaincode to build and run
     installAndInstantiate
     sleep 20
-    invoke  '{"Args":["set","key","updated value"]}'
+    invoke  '{"Args":["set","key","updated_value"]}'
     query  '{"Args":["get","key"]}'
 }
 
