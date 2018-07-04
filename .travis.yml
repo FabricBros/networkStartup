@@ -20,7 +20,7 @@ install:
 
   # Get appropriate binaries...
   - curl -sSL https://goo.gl/6wtTN5 | bash -s 1.1.0
-  - export PATH=`pwd`/bin:$PATH
+  - export PATH=`pwd`/fabric-samples/bin:$PATH
 
 before_script:
   # Check docker & docker-compose versions
