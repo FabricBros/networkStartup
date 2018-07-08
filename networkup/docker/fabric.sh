@@ -19,6 +19,11 @@ source .env
 ORG_HYPERLEDGER_FABRIC_SDKTEST_VERSION=${ORG_HYPERLEDGER_FABRIC_SDKTEST_VERSION:-}
 CHANNEL=${CHANNEL}
 
+if [[ -z "${CHANNEL}" ]] ; then
+    echo "Missing Channel environments default: 'mychannel' "
+    CHANNEL=mychannel
+fi
+
 function clean(){
 
   rm -rf /var/hyperledger/*
