@@ -200,7 +200,7 @@ function installAndInstantiate(){
 
 
 function stopCC(){
-    docker-compose -f docker-compose-chaincode.yaml down
+    docker-compose -f docker-compose-cc-dev.yaml down
 }
 
 
