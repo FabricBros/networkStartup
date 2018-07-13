@@ -91,6 +91,8 @@ services:
     volumes:
       - ./crypto/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org1.example.com/ca/:/etc/hyperledger/fabric-ca-server-config:ro
     container_name: ca_peerOrg1
+    networks:
+      - fabricbros
 ##################################################################
 ##################################################################
 #  ca1:
@@ -168,6 +170,8 @@ services:
         - "7059:7059"
       command: /usr/local/bin/configtxlator start
       container_name: configtxlator
+      networks:
+        - fabricbros
 ##################################################################
 ##################################################################
 #  ccenv:
