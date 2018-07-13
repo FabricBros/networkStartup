@@ -106,7 +106,7 @@ function instantiateCC(){
 
     echo "Instantiating cc with args: ${CC_ARGS}"
 
-    docker exec cli peer chaincode instantiate -n ${CC_NAME} -v ${CC_VER} -c '{"Args":["init","a","100","b","200"]}' -C foo
+    docker exec cli peer chaincode instantiate -o orderer.example.com:7050 -n ${CC_NAME} -v ${CC_VER} -c '{"Args":["init","a","100","b","200"]}' -C foo
 }
 
 
@@ -162,25 +162,27 @@ function query(){
 
 function startCC(){
 
-    CC_NAME=$1
-    CC_VER=$2
+    export CC_NAME=$1
+    export CC_VER=$2
+
     if [[ -z "${MHC_FABRIC_CCROOT}" ]] ; then
         echo "Missing MHC_FABRIC_CCROOT ENV! Set the ENV to the chaincode files path"
     fi
 
-    if [[ -z "${CC_NAME}" ]] ; then
+    if [[ -z "$CC_NAME" ]] ; then
         echo "Missing argument for CC_NAME setting default to 'defaultcc'"
         CC_NAME=defaultcc
     fi
 
-    if [[ -z "${CC_VER}" ]] ; then
+    if [[ -z "$CC_VER" ]] ; then
         echo "Missing argument for CC_VER setting default to v1"
         CC_VER=v1
     fi
 
 
-    echo "Using CC_NAME=${CC_NAME} and CC_VER=${CC_VER}"
-    cd ${MHC_FABRIC_CCROOT} && go clean && go build -o ccgo && CORE_CHAINCODE_LOGGING_LEVEL=DEBUG CORE_CHAINCODE_LOGGING_SHIM=DEBUG CORE_LOGGING_LEVEL=DEBUG CORE_PEER_ADDRESS=127.0.0.1:7052 CORE_CHAINCODE_ID_NAME=${CC_NAME}:${CC_VER} ./ccgo
+    echo "Using CC_NAME=$CC_NAME and CC_VER=$CC_VER"
+    docker-compose -f docker-compose-cc-dev.yaml up
+#    cd ${MHC_FABRIC_CCROOT} && go clean && go build -o ccgo && CORE_CHAINCODE_LOGGING_LEVEL=DEBUG CORE_CHAINCODE_LOGGING_SHIM=DEBUG CORE_LOGGING_LEVEL=DEBUG CORE_PEER_ADDRESS=127.0.0.1:7052 CORE_CHAINCODE_ID_NAME=${CC_NAME}:${CC_VER} ./ccgo
     exit 0
 }
 
@@ -197,8 +199,8 @@ function installAndInstantiate(){
 }
 
 
-function testThis(){
-    docker exec -it cli bash
+function stopCC(){
+    docker-compose -f docker-compose-chaincode.yaml down
 }
 
 
@@ -229,6 +231,9 @@ do
             ;;
         startCC)
             startCC $2 $3
+            ;;
+        stopCC)
+            stopCC
             ;;
         installCC)
             installCC $2 $3
