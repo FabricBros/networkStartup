@@ -17,6 +17,7 @@ networks:
 
 services:
 # usage docker exec -it cli bash
+
   cli:
     container_name: cli
     image: hyperledger/fabric-tools:latest
@@ -91,7 +92,7 @@ services:
 
     volumes:
       - ./crypto/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org1.example.com/ca/:/etc/hyperledger/fabric-ca-server-config:ro
-    container_name: ca_peerOrg1
+    container_name: capeerOrg1
     networks:
       - fabricbros
 ##################################################################
