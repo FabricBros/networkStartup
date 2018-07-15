@@ -37,7 +37,7 @@ arguments are optional
     ./fabric.sh runCC CC_NAME CC_VER
     (optional but args must match what was used for startCC)
     
-### Sample order to execute
+### Sample order to execute for dev mode(ensure base/peer-base.yaml command has dev mode enabled)
 
 `Terminal 1`
 
@@ -46,6 +46,16 @@ arguments are optional
 `Terminal 2`
 
     ./fabric.sh startCC ccname v1
+
+`Terminal 1`
+
+    ./fabric.sh runCC ccname v1
+    
+### Sample order to execute for non-dev mode(ensure base/peer-base.yaml command does not have dev mode enabled)
+
+`Terminal 1`
+
+    ./fabric.sh up
 
 `Terminal 1`
 
