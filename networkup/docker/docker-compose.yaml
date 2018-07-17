@@ -17,6 +17,19 @@ networks:
 
 services:
 # usage docker exec -it cli bash
+#
+  restapp:
+    image: huytran88/fabric-rest-api:latest
+    container_name: restapp
+    ports:
+      - ${PORT}:3000
+    environment:
+      - FAB_NETWORK_CONFIG=docker-network-.json
+    depends_on:
+      - cli
+    networks:
+      - fabricbros
+
   postgresql:
     image: postgres:10.4
     container_name: postgresql
@@ -40,10 +53,9 @@ services:
       - ${HLBC}:/opt/usr/fabric/bin
     command: ["./wait-for-postgres.sh","postgresql","npm", "start"]
     ports:
-      - 8080:8080
+      - ${BC_EXPLORER_PORT}:8080
     networks:
       - fabricbros
-
 
   cli:
     container_name: cli

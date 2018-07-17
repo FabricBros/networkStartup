@@ -30,5 +30,5 @@ services:
       - CORE_PEER_AUTHENTICATION_TIMEWINDOW=3600s
       - CORE_PEER_EVENTS_TIMEWINDOW=3600s
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
-    command: peer node start
-#    command: peer node start --peer-chaincodedev=true
+#    command: peer node start
+    command: peer node start --peer-chaincodedev=true

@@ -51,6 +51,7 @@ function up(){
     else
 #    docker-compose up --force-recreate
         docker-compose -f docker-compose.yaml -f docker-compose-couch.yaml up --force-recreate -d 2>&1
+
     fi
 
 }
@@ -203,6 +204,13 @@ function stopCC(){
     docker-compose -f docker-compose-cc-dev.yaml down
 }
 
+function upWithCC(){
+
+    up
+    sleep 5
+    installAndInstantiate $1 $2
+}
+
 
 for opt in "$@"
 do
@@ -238,8 +246,8 @@ do
         installCC)
             installCC $2 $3
             ;;
-        test)
-            testThis $2
+        upWithCC)
+            upWithCC $2 $3
             ;;
         restart)
             down
