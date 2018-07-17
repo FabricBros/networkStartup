@@ -21,10 +21,6 @@ services:
     image: postgres:10.4
     container_name: postgresql
     restart: always
-    environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_USER: hppoc
-      POSTGRES_DB: fabricexplorer
     ports:
       - 5432:5432
     networks:
@@ -42,9 +38,12 @@ services:
     volumes:
       - ./crypto/:/opt/usr/fabric/crypto
       - ${HLBC}:/opt/usr/fabric/bin
-#      - ./bc-explorer-logs/:/usr/src/app/logs
+    command: ["./wait-for-postgres.sh","postgresql","npm", "start"]
+    ports:
+      - 8080:8080
     networks:
       - fabricbros
+
 
   cli:
     container_name: cli
