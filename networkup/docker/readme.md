@@ -2,7 +2,9 @@
 Chaincode development should take place in your GOPATH
 
 Setup ENV
-
+HLBC = path to fabric binaries, make sure its correct version 1.1
+PORT = port for java rest app for public exposure
+BC_EXPLORER_PORT = port for bc explorer
 
 vim ~/.bash_profile and export MHC_FABRIC_CCROOT=$GOPATH/src/\<path into your cc files>
 
