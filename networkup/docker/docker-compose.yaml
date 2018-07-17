@@ -17,6 +17,34 @@ networks:
 
 services:
 # usage docker exec -it cli bash
+  postgresql:
+    image: postgres:10.4
+    container_name: postgresql
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: hppoc
+      POSTGRES_DB: fabricexplorer
+    ports:
+      - 5432:5432
+    networks:
+      - fabricbros
+    volumes:
+      - ./postgres_explorer/init_script/:/docker-entrypoint-initdb.d/
+    depends_on:
+      - cli
+
+  bcexplorer:
+    image: huytran88/bc-explorer:latest
+    container_name: bc-explorer
+    depends_on:
+      - postgresql
+    volumes:
+      - ./crypto/:/opt/usr/fabric/crypto
+      - ${HLBC}:/opt/usr/fabric/bin
+#      - ./bc-explorer-logs/:/usr/src/app/logs
+    networks:
+      - fabricbros
 
   cli:
     container_name: cli
