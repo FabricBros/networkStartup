@@ -5,8 +5,14 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # simple batch script making it easier to cleanup and start a relatively fresh fabric env.
+set -a
+. ./.env
+set +a
 
 current_dir=$(pwd)
+export CHANNEL=$CHANNEL
+export MHC_FABRIC_CCROOT=$MHC_FABRIC_CCROOT
+export GOPATH=$GOPATH
 
 #echo $current_dir/test
 
@@ -106,7 +112,7 @@ function instantiateCC(){
 
     echo "Instantiating cc with args: ${CC_ARGS}"
 
-    docker exec cli peer chaincode instantiate -o orderer.example.com:7050 -n ${CC_NAME} -v ${CC_VER} -c '{"Args":["init","a","100","b","200"]}' -C foo
+    docker exec cli peer chaincode instantiate -o orderer.example.com:7050 -n ${CC_NAME} -v ${CC_VER} -c '{"Args":["init","a","100","b","200"]}' -C ${CHANNEL}
 }
 
 
@@ -131,7 +137,7 @@ function invoke(){
 
     echo "Init cc with args: ${CC_ARGS}"
 
-    docker exec cli peer chaincode invoke -n ${CC_NAME} -v ${CC_VER} -c ${CC_ARGS} -C foo
+    docker exec cli peer chaincode invoke -n ${CC_NAME} -v ${CC_VER} -c ${CC_ARGS} -C ${CHANNEL}
     # peer chaincode invoke -n mycc -c '{"Args":["invoke","a","b","10"]}' -o 127.0.0.1:7050 -C ch1
 }
 
@@ -157,7 +163,7 @@ function query(){
 
     echo "Init cc with args: ${CC_ARGS}"
 
-    docker exec cli peer chaincode query -n ${CC_NAME} -v ${CC_VER} -c ${CC_ARGS} -C foo
+    docker exec cli peer chaincode query -n ${CC_NAME} -v ${CC_VER} -c ${CC_ARGS} -C ${CHANNEL}
 }
 
 function startCC(){

@@ -16,11 +16,11 @@ services:
       - CORE_LOGGING_LEVEL=DEBUG
       - CORE_CHAINCODE_LOGGING_LEVEL=DEBUG
       - CORE_CHAINCODE_LOGGING_SHIM=DEBUG
-      - CORE_PEER_ID=peer0.org1.example.com
-      - CORE_PEER_ADDRESS=peer0.org1.example.com:7052 # maybe 127.0.0.1:7052
+      - CORE_PEER_ID=peer0.org1.example.com # req
+      - CORE_PEER_ADDRESS=peer0.org1.example.com:7052 # req
       - CORE_PEER_LOCALMSPID=DEFAULT
       - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/peer/msp
-      - CORE_CHAINCODE_ID_NAME=${CC_NAME}:${CC_VER}
+      - CORE_CHAINCODE_ID_NAME=${CC_NAME}:${CC_VER} # req
     working_dir: /opt/gopath/src/chaincode
     command: /bin/bash -c "echo 'using $CC_NAME and $CC_VER' && go clean && go build -o ccgo && ./ccgo"
     volumes:
