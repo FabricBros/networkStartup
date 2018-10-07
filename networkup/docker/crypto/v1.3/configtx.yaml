@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # configtxgen -profile TwoOrgsOrdererGenesis -outputBlock ./orderer.block -channelID foo
-# configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./foo.tx -channelID foo
+#
 ---
 ################################################################################
 #
