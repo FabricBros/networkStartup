@@ -27,3 +27,8 @@ network/docker/*.block
 /dist/
 /nbdist/
 /.nb-gradle/
+.DS_Store
+networkup/crypto/
+networkup/docker/bc-explorer-logs/
+networkup/docker/peer-config/
+networkup/fabric-ca/
