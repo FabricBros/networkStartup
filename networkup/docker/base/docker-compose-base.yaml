@@ -2,10 +2,29 @@ version: '2'
 
 
 services:
+
+  zookeeper:
+    image: hyperledger/fabric-zookeeper
+    restart: always
+    ports:
+      - '2182'
+      - '2888'
+      - '3888'
+
+  kafka:
+    image: hyperledger/fabric-kafka
+    restart: always
+    environment:
+      - KAFKA_MESSAGE_MAX_BYTES=1048576 # 1 * 1024 * 1024 B
+      - KAFKA_REPLICA_FETCH_MAX_BYTES=1048576 # 1 * 1024 * 1024 B
+      - KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE=false
+      - KAFKA_PORT=9093
+    ports:
+      - '9093'
 ##################################################################
 ##################################################################
-  orderer.example.com:
-    container_name: orderer.example.com
+  orderer0.example.com:
+    container_name: orderer0.example.com
     image: hyperledger/fabric-orderer${IMAGE_TAG_FABRIC}
     environment:
       - ORDERER_GENERAL_LOGLEVEL=debug
@@ -24,10 +43,39 @@ services:
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: orderer
     volumes:
-     - ./../crypto/${FAB_CONFIG_GEN_VERS}:/etc/hyperledger/configtx:ro
-     - ./../crypto/${FAB_CONFIG_GEN_VERS}/crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/:/etc/hyperledger/msp/orderer:ro
+      - orderer0.example.com:/var/hyperledger/production/orderer
+      - ./../crypto/${FAB_CONFIG_GEN_VERS}:/etc/hyperledger/configtx:ro
+      - ./../crypto/${FAB_CONFIG_GEN_VERS}/crypto-config/ordererOrganizations/example.com/orderers/orderer0.example.com/:/etc/hyperledger/msp/orderer:ro
     ports:
       - 7050:7050
+
+##################################################################
+##################################################################
+  orderer1.example.com:
+    container_name: orderer1.example.com
+    image: hyperledger/fabric-orderer${IMAGE_TAG_FABRIC}
+    environment:
+      - ORDERER_GENERAL_LOGLEVEL=debug
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/configtx/orderer.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/msp/orderer/msp
+      - ORDERER_GENERAL_TLS_ENABLED=${ORG_HYPERLEDGER_FABRIC_SDKTEST_INTEGRATIONTESTS_TLS}
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/etc/hyperledger/msp/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/msp/orderer/tls/server.crt
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/etc/hyperledger/msp/orderer/tls/ca.crt]
+      - GRPC_TRACE=all=true,
+      - GRPC_VERBOSITY=debug
+      - ORDERER_GENERAL_AUTHENTICATION_TIMEWINDOW=3600s #Not for production -- remove.
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+    command: orderer
+    volumes:
+      - orderer1.example.com:/var/hyperledger/production/orderer
+      - ./../crypto/${FAB_CONFIG_GEN_VERS}:/etc/hyperledger/configtx:ro
+      - ./../crypto/${FAB_CONFIG_GEN_VERS}/crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/:/etc/hyperledger/msp/orderer:ro
+    ports:
+      - 8050:7050
 
 ##################################################################
 ##################################################################
@@ -40,6 +88,7 @@ services:
       - CORE_PEER_ID=peer0.org1.example.com
       - CORE_PEER_ADDRESS=peer0.org1.example.com:7051
       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org1.example.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.org1.example.com:7051
 #      - CORE_PEER_GOSSIP_ORGLEADER=true
       - CORE_PEER_LOCALMSPID=Org1MSP
     volumes:
@@ -47,6 +96,7 @@ services:
       - ./../crypto/${FAB_CONFIG_GEN_VERS}/:/channel-artifacts:ro
       - ./../crypto/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/:/etc/hyperledger/admin
       - ./../crypto/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/:/etc/hyperledger/msp/peer:ro
+      - peer0.org1.example.com:/var/hyperledger/production
     ports:
       - 7051:7051
       - 7052:7052
@@ -63,16 +113,17 @@ services:
       - CORE_PEER_ID=peer1.org1.example.com
       - CORE_PEER_ADDRESS=peer1.org1.example.com:7051
       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org1.example.com:7051
-#      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org1.example.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org1.example.com:7051
       - CORE_PEER_LOCALMSPID=Org1MSP
     volumes:
-         - /var/run/:/host/var/run/
-         - ./../crypto/${FAB_CONFIG_GEN_VERS}/:/channel-artifacts:ro
-         - ./../crypto/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/:/etc/hyperledger/msp/peer:ro
+      - /var/run/:/host/var/run/
+      - ./../crypto/${FAB_CONFIG_GEN_VERS}/:/channel-artifacts:ro
+      - ./../crypto/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/:/etc/hyperledger/msp/peer:ro
+      - peer1.org1.example.com:/var/hyperledger/production
     ports:
-       - 7056:7051
-       - 7057:7052
-       - 7058:7053
+      - 7056:7051
+      - 7057:7052
+      - 7058:7053
 
 ##################################################################
 ##################################################################
@@ -84,13 +135,15 @@ services:
     environment:
       - CORE_PEER_ID=peer0.org2.example.com
       - CORE_PEER_ADDRESS=peer0.org2.example.com:7051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org2.example.com:8051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org2.example.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.org2.example.com:7051
 #      - CORE_PEER_GOSSIP_ORGLEADER=true
       - CORE_PEER_LOCALMSPID=Org2MSP
     volumes:
       - /var/run/:/host/var/run/
       - ./../crypto/${FAB_CONFIG_GEN_VERS}/:/channel-artifacts:ro
       - ./../crypto/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/:/etc/hyperledger/msp/peer:ro
+      - peer0.org2.example.com:/var/hyperledger/production
     ports:
       - 8051:7051
       - 8052:7052
@@ -100,19 +153,20 @@ services:
   peer1.org2.example.com:
     container_name: peer1.org2.example.com
     extends:
-          file: peer-base.yaml
-          service: peer-base
+      file: peer-base.yaml
+      service: peer-base
     environment:
       - CORE_PEER_ID=peer1.org2.example.com
       - CORE_PEER_ADDRESS=peer1.org2.example.com:7051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org2.example.com:8051
-#      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org2.example.com:8051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org2.example.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org2.example.com:7051
       - CORE_PEER_LOCALMSPID=Org2MSP
     volumes:
-         - /var/run/:/host/var/run/
-         - ./../crypto/${FAB_CONFIG_GEN_VERS}/:/channel-artifacts:ro
-         - ./../crypto/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org2.example.com/peers/peer1.org2.example.com/:/etc/hyperledger/msp/peer:ro
+      - /var/run/:/host/var/run/
+      - ./../crypto/${FAB_CONFIG_GEN_VERS}/:/channel-artifacts:ro
+      - ./../crypto/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org2.example.com/peers/peer1.org2.example.com/:/etc/hyperledger/msp/peer:ro
+      - peer1.org2.example.com:/var/hyperledger/production
     ports:
-       - 8056:7051
-       - 8057:7052
-       - 8058:7053
+      - 8056:7051
+      - 8057:7052
+      - 8058:7053

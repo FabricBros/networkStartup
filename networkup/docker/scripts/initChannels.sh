@@ -12,7 +12,7 @@ pwd
 # first we create the channel against the specified configuration in myc.tx
 # this call returns a channel configuration block - myc.block - to the CLI container
 echo "creating channel"
-peer channel create -c foo -f ./crypto/v1.1/foo.tx -o orderer.example.com:7050
+peer channel create -c foo -f ./crypto/v1.3/foo.tx -o orderer0.example.com:7050
 
 # now we will join the channel and start the chain with myc.block serving as the
 # channel's first block (i.e. the genesis block)

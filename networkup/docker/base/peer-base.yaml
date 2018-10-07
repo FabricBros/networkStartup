@@ -9,13 +9,12 @@ services:
       # bridge network as the peers
       # https://docs.docker.com/compose/networking/
       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=docker_fabricbros
-#      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=sdkintegration_fabricbros
       #- CORE_LOGGING_LEVEL=ERROR
       - CORE_LOGGING_LEVEL=DEBUG
-      - CORE_PEER_ENDORSER_ENABLED=true
+#      - CORE_PEER_ENDORSER_ENABLED=true TODO not known
       - CORE_PEER_GOSSIP_USELEADERELECTION=true
       - CORE_PEER_GOSSIP_ORGLEADER=false
-      - CORE_PEER_CHANNELSERVICE_ENABLED=true
+#      - CORE_PEER_CHANNELSERVICE_ENABLED=true TODO not known
       # The following setting skips the gossip handshake since we are
       # are not doing mutual TLS
       - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/peer/msp
