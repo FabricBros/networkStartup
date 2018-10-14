@@ -17,8 +17,27 @@ networks:
   fabricbros:
 
 services:
-
-
+  cli:
+    container_name: cli
+    image: hyperledger/fabric-tools:latest
+    environment:
+      - GOPATH=/opt/gopath
+      - CORE_PEER_ADDRESS=peer0.org1.example.com:7051
+      - CORE_PEER_LOCALMSPID=Org1MSP
+      - CORE_PEER_TLS_ENABLED=false
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+    working_dir:  /opt/gopath/src/chaincodedev
+    command: /bin/bash -c 'sleep 60000'
+    volumes:
+        - /var/run/:/host/var/run/
+        - ${MHC_FABRIC_CCROOT}:/opt/gopath/src/chaincode
+        - ./crypto/${FAB_CONFIG_GEN_VERS}/crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+        - ./scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+        - ./:/opt/gopath/src/chaincodedev/
+        - ${GOPATH}:/opt/gopath
+    networks:
+      - fabricbros
 
   zookeeper0:
     container_name: zookeeper0
@@ -149,35 +168,40 @@ services:
 #    networks:
 #      - fabricbros
 
-  initChannel:
-    container_name: initChannel
-    image: hyperledger/fabric-tools${IMAGE_TAG_FABRIC}
-    environment:
-      - GOPATH=/opt/gopath
-      - CORE_PEER_ID=peer0.org1.example.com
-      - CORE_PEER_ADDRESS=peer0.org1.example.com:7051
-      - CORE_PEER_LOCALMSPID=Org1MSP
-      - CORE_PEER_TLS_ENABLED=false
-      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
-      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-    working_dir:  /opt/gopath/src/chaincodedev
-    command: /bin/bash -c 'sleep 30 && ./scripts/initChannels.sh'
-    volumes:
-        - /var/run/:/host/var/run/
-        - ./crypto/${FAB_CONFIG_GEN_VERS}/crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
-        - ./scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
-        - ./:/opt/gopath/src/chaincodedev/
-        - ${GOPATH}:/opt/gopath
-    depends_on:
-      - orderer0.example.com
-      - orderer1.example.com
-      - peer0.org1.example.com
-      - peer1.org1.example.com
-      - peer0.org2.example.com
-      - peer1.org2.example.com
-    networks:
-      - fabricbros
-
+#  initChannel:
+#    container_name: initChannel
+#    image: hyperledger/fabric-tools${IMAGE_TAG_FABRIC}
+#    environment:
+#      - GOPATH=/opt/gopath
+#      - CORE_PEER_ID=peer0.org1.example.com
+#      - CORE_PEER_ADDRESS=peer0.org1.example.com:7051
+#      - CORE_PEER_LOCALMSPID=Org1MSP
+#      - CORE_PEER_TLS_ENABLED=false
+#      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/orderer0.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+#      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+#
+##      - CORE_PEER_LOCALMSPID=OrdererMSP
+##      - CORE_PEER_TLS_ENABLED=false
+##      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/orderer0.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+##      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/users/Admin@example.com/msp
+#    working_dir:  /opt/gopath/src/chaincodedev
+#    command: /bin/bash -c 'sleep 30 && ./scripts/initChannels.sh'
+#    volumes:
+#        - /var/run/:/host/var/run/
+#        - ./crypto/${FAB_CONFIG_GEN_VERS}/crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+#        - ./scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+#        - ./:/opt/gopath/src/chaincodedev/
+#        - ${GOPATH}:/opt/gopath
+#    depends_on:
+#      - orderer0.example.com
+#      - orderer1.example.com
+#      - peer0.org1.example.com
+#      - peer1.org1.example.com
+#      - peer0.org2.example.com
+#      - peer1.org2.example.com
+#    networks:
+#      - fabricbros
+#
 
 #  chaincode:
 #    container_name: chaincode

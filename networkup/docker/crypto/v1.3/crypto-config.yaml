@@ -2,7 +2,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-
+# cryptogen generate --config=crypto-config.yaml
+# cryptogen extend --input="crypto-config" --config=crypto-config-org3.yaml
 # ---------------------------------------------------------------------------
 # "OrdererOrgs" - Definition of organizations managing orderer nodes
 # ---------------------------------------------------------------------------
@@ -19,7 +20,18 @@ OrdererOrgs:
 #      - Hostname: orderer
     Template:
       Count: 2
-    User:
+    Users:
+      Count: 2
+  - Name: Orderer2
+    Domain: example2.com
+    # ---------------------------------------------------------------------------
+    # "Specs" - See PeerOrgs below for complete description
+    # ---------------------------------------------------------------------------
+#    Specs:
+#      - Hostname: orderer
+    Template:
+      Count: 2
+    Users:
       Count: 2
 # ---------------------------------------------------------------------------
 # "PeerOrgs" - Definition of organizations managing peer nodes

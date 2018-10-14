@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-# configtxgen -profile TwoOrgsOrdererGenesis -outputBlock ./orderer.block -channelID foo
-#
+# configtxgen -profile TwoOrgsOrdererGenesisx -outputBlock ./orderer.block -channelID systemchannel
+# configtxgen -profile TwoOrgsChannelx -outputCreateChannelTx ./foo.tx -channelID foo
 ---
 ################################################################################
 #
@@ -302,7 +302,7 @@ Channel: &ChannelDefaults
 ################################################################################
 Profiles:
 
-    TwoOrgsOrdererGenesis:
+    TwoOrgsOrdererGenesisx:
         <<: *ChannelDefaults
         Orderer:
             <<: *OrdererDefaults
@@ -315,7 +315,7 @@ Profiles:
                 Organizations:
                     - *Org1
                     - *Org2
-    TwoOrgsChannel:
+    TwoOrgsChannelx:
         Consortium: SampleConsortium
         Application:
             <<: *ApplicationDefaults
